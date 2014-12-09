@@ -96,6 +96,13 @@ SDL_Rect sdlBoundRect(SDL_Rect src, const SDL_Rect &bounds)
     return src;
 }
 
+double sdlDistance(const SDL_Point &p1, const SDL_Point &p2)
+{
+    const double dx = p1.x - p2.x;
+    const double dy = p1.y - p2.y;
+    return std::sqrt(dx * dx + dy * dy);
+}
+
 SdlClipRect::SdlClipRect(SDL_Renderer *renderer, const SDL_Rect &clip)
     : ren_{renderer},
     orig_{}
@@ -123,4 +130,25 @@ SdlDrawColor::SdlDrawColor(SDL_Renderer *ren, Uint8 r, Uint8 g, Uint8 b)
 SdlDrawColor::~SdlDrawColor()
 {
     SDL_SetRenderDrawColor(ren_, origR_, origG_, origB_, SDL_ALPHA_OPAQUE);
+}
+
+SdlLockSurface::SdlLockSurface(SdlSurface &surf)
+    : surf_{surf},
+    locked_{false}
+{
+    if (SDL_MUSTLOCK(surf_.get())) {
+        if (SDL_LockSurface(surf_.get()) == 0) {
+            locked_ = true;
+        }
+        else {
+            std::cerr << "Error locking surface: " << SDL_GetError();
+        }
+    }
+}
+
+SdlLockSurface::~SdlLockSurface()
+{
+    if (locked_ && SDL_MUSTLOCK(surf_.get())) {
+        SDL_UnlockSurface(surf_.get());
+    }
 }

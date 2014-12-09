@@ -42,6 +42,9 @@ bool sdlInsideRect(int px, int py, const SDL_Rect &rect);
 // Translate a rectangle such that it stays inside the boundary.
 SDL_Rect sdlBoundRect(SDL_Rect src, const SDL_Rect &bounds);
 
+// Pixel-level Euclidian distance.
+double sdlDist(const SDL_Point &p1, const SDL_Point &p2);
+
 // RAII guard for setting/restoring the clipping region.
 class SdlClipRect
 {
@@ -64,6 +67,18 @@ private:
     Uint8 origR_;
     Uint8 origG_;
     Uint8 origB_;
+};
+
+// RAII guard for locking a surface.
+class SdlLockSurface
+{
+public:
+    SdlLockSurface(SdlSurface &surf);
+    ~SdlLockSurface();
+
+private:
+    SdlSurface surf_;
+    bool locked_;
 };
 
 #endif
