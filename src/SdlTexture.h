@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2014 by Michael Kristofik <kristo605@gmail.com>
-    Part of the Champions of Anduran project.
+    Part of the influence-map project.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 2
@@ -17,7 +17,7 @@
 #include "sdl_utils.h"
 #include <memory>
 
-// Wrapper around SDL_Texture, representing an image in video memory.
+// Wrapper around SDL_Texture, representing a static image in video memory.
 class SdlTexture
 {
 public:
@@ -54,7 +54,7 @@ private:
     SDL_Rect getDestRect(int px, int py,
                          const SDL_Rect *srcRect = nullptr) const;
 
-    std::unique_ptr<SDL_Texture, void (*)(SDL_Texture *)> texture_;
+    std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> texture_;
     SDL_Renderer *renderer_;
     int width_;
     int height_;

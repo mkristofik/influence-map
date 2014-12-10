@@ -14,7 +14,8 @@ link_directories("C:/MyLibs/SDL2-2.0.3/i686-w64-mingw32/lib"
     "c:/MyLibs/boost_1_52_0/lib")
 
 set(EXE game)
-set(SRC SdlWindow.cpp sdl_utils.cpp main.cpp)
+set(SRC SdlTexture.cpp SdlWindow.cpp SimpleMap.cpp sdl_utils.cpp voronoi.cpp
+    main.cpp)
 add_executable(${EXE} ${SRC})
 
 # Must appear after add_executable line.

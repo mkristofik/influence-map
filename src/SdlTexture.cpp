@@ -1,6 +1,6 @@
 /*
     Copyright (C) 2014 by Michael Kristofik <kristo605@gmail.com>
-    Part of the Champions of Anduran project.
+    Part of the influence-map project.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 2

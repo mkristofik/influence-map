@@ -10,16 +10,35 @@
 
     See the COPYING.txt file for more details.
 */
-
 #include "SdlWindow.h"
+#include "SimpleMap.h"
 #include "sdl_utils.h"
 #include <cstdlib>
 #include <iostream>
+#include <memory>
+
+namespace
+{
+    const int winWidth = 1280;
+    const int winHeight = 768;
+}
 
 int real_main(int argc, char **argv)
 {
-    SdlWindow win(1280, 768, "Influence Map Test");
+    SdlWindow win(winWidth, winHeight, "Influence Map Test");
+    auto advMap = SimpleMap(winWidth, winHeight);
+    auto surf = win.createBlankSurface(winWidth, winHeight);
+    advMap.draw(surf);
+    std::unique_ptr<SDL_Texture, decltype(&SDL_DestroyTexture)> tex{nullptr, SDL_DestroyTexture};
+    tex.reset(SDL_CreateTexture(win.getRenderer(),
+                                surf->format->format,
+                                SDL_TEXTUREACCESS_STREAMING,
+                                surf->w,
+                                surf->h));
+
+    SDL_UpdateTexture(tex.get(), nullptr, surf->pixels, surf->pitch);
     win.clear();
+    SDL_RenderCopy(win.getRenderer(), tex.get(), nullptr, nullptr);  // TODO
     win.draw();
 
     bool isDone = false;

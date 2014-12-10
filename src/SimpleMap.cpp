@@ -27,24 +27,17 @@ SimpleMap::SimpleMap(int width, int height)
 
 void SimpleMap::draw(SdlSurface &surf) const
 {
-    // for each pixel in surface
-    // if one of 8 neighbors is in a different region, color black
-    // else, color light grey
-
-    /*
-     SDL_CreateTexture(renderer,
-                       SDL_PIXELFORMAT_ARGB8888,
-                       SDL_TEXTUREACCESS_STREAMING,
-                       width,
-                       height);
-
-     Uint32 * surface->pixels
-     SDL_MapRGB(surface->format, r, g, b);
-     SDL_UpdateTexture(sdlTexture, NULL, surface->pixels, surface->pitch);
-     SDL_RenderClear(sdlRenderer);  --> SdlWindow::clear
-     SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);
-     SDL_RenderPresent(sdlRenderer);  --> SdlWindow::draw
-     */
+    const auto grey = SDL_MapRGB(surf->format, 192, 192, 192);
+    const auto black = SDL_MapRGB(surf->format, 0, 0, 0);
+    auto p = reinterpret_cast<Uint32 *>(surf->pixels);
+    for (int i = 0; i < width_ * height_; ++i, ++p) {
+        if (neighborsDiff(i)) {
+            *p = black;
+        }
+        else {
+            *p = grey;
+        }
+    }
 }
 
 SDL_Point SimpleMap::pixelFromAry(int a) const
