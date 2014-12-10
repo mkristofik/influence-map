@@ -69,16 +69,4 @@ private:
     Uint8 origB_;
 };
 
-// RAII guard for locking a surface.
-class SdlLockSurface
-{
-public:
-    SdlLockSurface(SdlSurface &surf);
-    ~SdlLockSurface();
-
-private:
-    SdlSurface surf_;
-    bool locked_;
-};
-
 #endif

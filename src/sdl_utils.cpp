@@ -131,24 +131,3 @@ SdlDrawColor::~SdlDrawColor()
 {
     SDL_SetRenderDrawColor(ren_, origR_, origG_, origB_, SDL_ALPHA_OPAQUE);
 }
-
-SdlLockSurface::SdlLockSurface(SdlSurface &surf)
-    : surf_{surf},
-    locked_{false}
-{
-    if (SDL_MUSTLOCK(surf_.get())) {
-        if (SDL_LockSurface(surf_.get()) == 0) {
-            locked_ = true;
-        }
-        else {
-            std::cerr << "Error locking surface: " << SDL_GetError();
-        }
-    }
-}
-
-SdlLockSurface::~SdlLockSurface()
-{
-    if (locked_ && SDL_MUSTLOCK(surf_.get())) {
-        SDL_UnlockSurface(surf_.get());
-    }
-}
