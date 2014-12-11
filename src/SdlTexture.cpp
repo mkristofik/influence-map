@@ -47,6 +47,14 @@ SdlTexture::SdlTexture(const SdlSurface &surf, SdlWindow &win)
 {
 }
 
+SdlTexture::SdlTexture(SDL_Texture *tex, SdlWindow &win, int width, int height)
+    : texture_{tex, SDL_DestroyTexture},
+    renderer_{win.getRenderer()},
+    width_{width},
+    height_{height}
+{
+}
+
 int SdlTexture::width() const
 {
     return width_;

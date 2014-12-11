@@ -25,6 +25,9 @@ public:
     SdlTexture(const SdlSurface &surf, SDL_Renderer *renderer);
     SdlTexture(const SdlSurface &surf, SdlWindow &win);
 
+    // Take control of an existing texture.
+    SdlTexture(SDL_Texture *tex, SdlWindow &win, int width, int height);
+
     int width() const;
     int height() const;
 
