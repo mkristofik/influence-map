@@ -14,7 +14,7 @@
 
 namespace
 {
-    const int xRegions = 6;
+    const int xRegions = 8;
     const int yRegions = 4;
     const SDL_Point xyInvalid = {-1, -1};
 }

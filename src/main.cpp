@@ -14,6 +14,7 @@
 #include "SdlWindow.h"
 #include "SimpleMap.h"
 #include "sdl_utils.h"
+#include "team_color.h"
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -32,8 +33,15 @@ int real_main(int argc, char **argv)
     advMap.draw(surf);
     SdlTextureStream advMapImg{surf, win};
 
+    auto img1 = applyTeamColor(sdlLoadImage("cavalier.png"), Team::BLUE);
+    auto player1 = SdlTexture{img1, win};
+    auto img2 = applyTeamColor(sdlLoadImage("orc-grunt.png"), Team::RED);
+    auto player2 = SdlTexture{img2, win};
+
     win.clear();
     advMapImg.draw(0, 0);
+    player1.draw(44, 60);
+    player2.draw(1164, 636);
     win.draw();
 
     bool isDone = false;
