@@ -15,7 +15,7 @@ link_directories("C:/MyLibs/SDL2-2.0.3/i686-w64-mingw32/lib"
 
 set(EXE game)
 set(SRC SdlTexture.cpp SdlTextureStream.cpp SdlWindow.cpp SimpleMap.cpp
-    sdl_utils.cpp voronoi.cpp main.cpp)
+    sdl_utils.cpp team_color.cpp voronoi.cpp main.cpp)
 add_executable(${EXE} ${SRC})
 
 # Must appear after add_executable line.

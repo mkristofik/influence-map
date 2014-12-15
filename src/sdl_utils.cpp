@@ -28,8 +28,23 @@ namespace
         imagePath /= filename;
         return imagePath.string();
     }
+
+    Uint32 uintFromColor(const SDL_Color &src)
+    {
+        return (src.r << 24) | (src.g << 16) | (src.b << 8) | src.a;
+    }
 }
 
+
+bool operator==(const SDL_Color &lhs, const SDL_Color &rhs)
+{
+    return uintFromColor(lhs) == uintFromColor(rhs);
+}
+
+bool operator<(const SDL_Color &lhs, const SDL_Color &rhs)
+{
+    return uintFromColor(lhs) < uintFromColor(rhs);
+}
 
 void sdlInit()
 {
@@ -49,6 +64,26 @@ void sdlInit()
 SdlSurface make_surface(SDL_Surface *surf)
 {
     return SdlSurface(surf, SDL_FreeSurface);
+}
+
+SdlSurface sdlDeepCopy(const SdlSurface &src)
+{
+    auto dest = SDL_CreateRGBSurface(0,
+                                     src->w,
+                                     src->h,
+                                     src->format->BitsPerPixel,
+                                     src->format->Rmask,
+                                     src->format->Gmask,
+                                     src->format->Bmask,
+                                     src->format->Amask);
+    if (!dest) {
+        std::cerr << "Error copying surface: " << SDL_GetError();
+        return nullptr;
+    }
+
+    memcpy(dest->pixels, src->pixels,
+           src->w * src->h * src->format->BytesPerPixel);
+    return make_surface(dest);
 }
 
 SdlSurface sdlLoadImage(const char *filename)
@@ -130,4 +165,25 @@ SdlDrawColor::SdlDrawColor(SDL_Renderer *ren, Uint8 r, Uint8 g, Uint8 b)
 SdlDrawColor::~SdlDrawColor()
 {
     SDL_SetRenderDrawColor(ren_, origR_, origG_, origB_, SDL_ALPHA_OPAQUE);
+}
+
+SdlLockSurface::SdlLockSurface(SdlSurface &surf)
+    : surf_{surf.get()},
+    locked_{false}
+{
+    if (SDL_MUSTLOCK(surf_)) {
+        if (SDL_LockSurface(surf_) == 0) {
+            locked_ = true;
+        }
+        else {
+            std::cerr << "Error locking surface: " << SDL_GetError();
+        }
+    }
+}
+
+SdlLockSurface::~SdlLockSurface()
+{
+    if (locked_ && SDL_MUSTLOCK(surf_)) {
+        SDL_UnlockSurface(surf_);
+    }
 }

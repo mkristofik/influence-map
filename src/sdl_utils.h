@@ -23,11 +23,16 @@ const SDL_Color YELLOW = {255, 255, 0, SDL_ALPHA_OPAQUE};
 const SDL_Color BORDER_FG = {96, 100, 96, SDL_ALPHA_OPAQUE};
 const SDL_Color BORDER_BG = {32, 32, 24, SDL_ALPHA_OPAQUE};
 
+bool operator==(const SDL_Color &lhs, const SDL_Color &rhs);
+bool operator<(const SDL_Color &lhs, const SDL_Color &rhs);
+
 // Must call this before any other SDL functions will work.
 void sdlInit();
 
 // Like std::make_shared, but with SDL_Surface.
 SdlSurface make_surface(SDL_Surface *surf);
+
+SdlSurface sdlDeepCopy(const SdlSurface &src);
 
 // Load a resource from disk.  Returns null on failure.
 // note: don't try to allocate these at global scope.  They need sdlInit()
@@ -67,6 +72,17 @@ private:
     Uint8 origR_;
     Uint8 origG_;
     Uint8 origB_;
+};
+
+// RAII guard for pixel-level access to a surface.
+class SdlLockSurface
+{
+public:
+    SdlLockSurface(SdlSurface &surf);
+    ~SdlLockSurface();
+private:
+    SDL_Surface *surf_;
+    bool locked_;
 };
 
 #endif
