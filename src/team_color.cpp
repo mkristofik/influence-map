@@ -13,20 +13,17 @@
 #include "team_color.h"
 #include <algorithm>
 #include <cassert>
-#include <iostream>  // TODO
-#include <unordered_map>
-#include <vector>
+
+// Reference color for each team.  The other 18 shades are offset from
+// this, 14 darker and 4 lighter.
+const std::vector<SDL_Color> teamColors = {
+    {0x2E, 0x41, 0x9B, 0}, // blue
+    {0xFF, 0, 0, 0},       // red
+};
 
 namespace
 {
     using TeamColorMatrix = std::vector<std::vector<SDL_Color>>;
-
-    // Reference color for each team.  The other 18 shades are offset from
-    // this, 14 darker and 4 lighter.
-    const std::vector<SDL_Color> teamColors = {
-        {0x2E, 0x41, 0x9B, 0}, // blue
-        {0xFF, 0, 0, 0},       // red
-    };
 
     // Magenta color palette to be replaced by team colors.
     const std::vector<SDL_Color> baseColors = {

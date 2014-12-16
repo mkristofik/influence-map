@@ -14,23 +14,32 @@
 #define SIMPLE_MAP_H
 
 #include "sdl_utils.h"
+#include "team_color.h"
+#include <vector>
 
 class SimpleMap
 {
 public:
-    SimpleMap(int width, int height);
+    SimpleMap(int width, int height, int numTeams);
     void draw(SdlSurface &surf) const;
+    void setInfluence(int region, Team team, int value);
 
 private:
     SDL_Point pixelFromAry(int a) const;
     int regionFromPixel(const SDL_Point &p) const;
     int regionFromAry(int a) const;
 
-    // Are any of the 8 neighboring pixels in a different region?
-    bool neighborsDiff(int a) const;
+    SDL_Color getColor(int a) const;
+    SDL_Color getBorderColor(int reg1, int reg2) const;
+
+    // Return the team number with the most influence in a region, or -1 if all
+    // teams have the same influence.
+    int getOwner(int region) const;
 
     int width_;
     int height_;
+    int numTeams_;
+    std::vector<int> influence_;
 };
 
 #endif

@@ -20,8 +20,10 @@ using SdlSurface = std::shared_ptr<SDL_Surface>;
 
 const SDL_Color WHITE = {255, 255, 255, SDL_ALPHA_OPAQUE};
 const SDL_Color YELLOW = {255, 255, 0, SDL_ALPHA_OPAQUE};
+const SDL_Color GREY = {192, 192, 192, SDL_ALPHA_OPAQUE};
 const SDL_Color BORDER_FG = {96, 100, 96, SDL_ALPHA_OPAQUE};
 const SDL_Color BORDER_BG = {32, 32, 24, SDL_ALPHA_OPAQUE};
+const SDL_Color BLACK = {0, 0, 0, SDL_ALPHA_OPAQUE};
 
 bool operator==(const SDL_Color &lhs, const SDL_Color &rhs);
 bool operator<(const SDL_Color &lhs, const SDL_Color &rhs);

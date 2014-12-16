@@ -15,12 +15,14 @@
 
 #include "SdlWindow.h"
 #include "sdl_utils.h"
+#include <vector>
 
 // This is an implementation of the team color algorithm from Battle for
 // Wesnoth.  We reserve a specific palette of 19 shades of magenta as a
 // reference.  Those colors are replaced at runtime with the corresponding
 // color for each team.
 enum class Team {BLUE, RED};
+extern const std::vector<SDL_Color> teamColors;
 
 SdlSurface applyTeamColor(const SdlSurface &src, Team team);
 

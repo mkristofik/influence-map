@@ -28,7 +28,10 @@ namespace
 int real_main(int argc, char **argv)
 {
     SdlWindow win{winWidth, winHeight, "Influence Map Test"};
-    SimpleMap advMap{winWidth, winHeight};
+    SimpleMap advMap{winWidth, winHeight, 2};
+    advMap.setInfluence(0, Team::BLUE, 8);
+    advMap.setInfluence(31, Team::RED, 8);
+
     auto surf = win.createBlankSurface(winWidth, winHeight);
     advMap.draw(surf);
     SdlTextureStream advMapImg{surf, win};
