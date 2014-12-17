@@ -12,6 +12,7 @@
 */
 #include "SimpleMap.h"
 #include <algorithm>
+#include <iostream> //TODO
 
 namespace
 {
@@ -20,28 +21,32 @@ namespace
     const SDL_Point xyInvalid = {-1, -1};
 }
 
-SimpleMap::SimpleMap(int width, int height, int numTeams)
+SimpleMap::SimpleMap(int width, int height, int numTeams, const SdlWindow &win)
     : width_{width},
     height_{height},
     numTeams_{numTeams},
-    influence_(xRegions * yRegions * numTeams, 0)
+    influence_(xRegions * yRegions * numTeams_, 0),
+    updateSurf_{win.createBlankSurface(width_, height_)}
 {
 }
 
-void SimpleMap::draw(SdlSurface &surf) const
+SdlSurface SimpleMap::draw()
 {
-    SdlLockSurface guard{surf};
+    relaxInfluence();
 
-    auto p = static_cast<Uint8 *>(surf->pixels);
-    const auto bpp = surf->format->BytesPerPixel;
+    SdlLockSurface guard{updateSurf_};
+    auto p = static_cast<Uint8 *>(updateSurf_->pixels);
+    const auto bpp = updateSurf_->format->BytesPerPixel;
     for (int i = 0; i < width_ * height_; ++i, p += bpp) {
-        sdlSetPixel(surf, p, getColor(i));
+        sdlSetPixel(updateSurf_, p, getColor(i));
     }
+
+    return updateSurf_;
 }
 
 void SimpleMap::setInfluence(int region, Team team, int value)
 {
-    influence_[region * numTeams_ + static_cast<int>(team)] = value;
+    influence_[teamOffset(region, team)] = value;
 }
 
 SDL_Point SimpleMap::pixelFromAry(int a) const
@@ -127,12 +132,45 @@ SDL_Color SimpleMap::getBorderColor(int reg1, int reg2) const
 
 int SimpleMap::getOwner(int region) const
 {
-    auto begin = &influence_[region * numTeams_];
-    auto end = &influence_[(region + 1) * numTeams_];
+    auto begin = &influenceToDraw_[region * numTeams_];
+    auto end = &influenceToDraw_[(region + 1) * numTeams_];
     auto maxPtr = std::max_element(begin, end);
     if (*maxPtr > 0) {
         return std::distance(begin, maxPtr);
     }
 
     return -1;
+}
+
+int SimpleMap::teamOffset(int region, Team team) const
+{
+    return region * numTeams_ + static_cast<int>(team);
+}
+
+void SimpleMap::relaxInfluence()
+{
+    influenceToDraw_ = influence_;
+    const int size = influenceToDraw_.size();
+    for (int i = 0; i < size; ++i) {
+        if (influence_[i] == 0) {
+            continue;
+        }
+
+        const auto offsetN = i - xRegions * numTeams_;
+        if (offsetN >= 0) {
+            influenceToDraw_[offsetN] = influence_[i] / 4;
+        }
+        const auto offsetE = i + numTeams_;
+        if (offsetE < size) {
+            influenceToDraw_[offsetE] = influence_[i] / 4;
+        }
+        const auto offsetS = i + xRegions * numTeams_;
+        if (offsetS < size) {
+            influenceToDraw_[offsetS] = influence_[i] / 4;
+        }
+        const auto offsetW = i - numTeams_;
+        if (offsetW >= 0) {
+            influenceToDraw_[offsetW] = influence_[i] / 4;
+        }
+    }
 }

@@ -28,13 +28,11 @@ namespace
 int real_main(int argc, char **argv)
 {
     SdlWindow win{winWidth, winHeight, "Influence Map Test"};
-    SimpleMap advMap{winWidth, winHeight, 2};
-    advMap.setInfluence(0, Team::BLUE, 8);
+    SimpleMap advMap{winWidth, winHeight, 2, win};
+    advMap.setInfluence(1, Team::BLUE, 8);
     advMap.setInfluence(31, Team::RED, 8);
 
-    auto surf = win.createBlankSurface(winWidth, winHeight);
-    advMap.draw(surf);
-    SdlTextureStream advMapImg{surf, win};
+    SdlTextureStream advMapImg{advMap.draw(), win};
 
     auto img1 = applyTeamColor(sdlLoadImage("cavalier.png"), Team::BLUE);
     auto player1 = SdlTexture{img1, win};
@@ -43,7 +41,7 @@ int real_main(int argc, char **argv)
 
     win.clear();
     advMapImg.draw(0, 0);
-    player1.draw(44, 60);
+    player1.draw(204, 60);
     player2.draw(1164, 636);
     win.draw();
 

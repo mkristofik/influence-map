@@ -13,6 +13,7 @@
 #ifndef SIMPLE_MAP_H
 #define SIMPLE_MAP_H
 
+#include "SdlWindow.h"
 #include "sdl_utils.h"
 #include "team_color.h"
 #include <vector>
@@ -20,8 +21,8 @@
 class SimpleMap
 {
 public:
-    SimpleMap(int width, int height, int numTeams);
-    void draw(SdlSurface &surf) const;
+    SimpleMap(int width, int height, int numTeams, const SdlWindow &win);
+    SdlSurface draw();
     void setInfluence(int region, Team team, int value);
 
 private:
@@ -36,10 +37,18 @@ private:
     // teams have the same influence.
     int getOwner(int region) const;
 
+    // Return the index of the team's data in the influence map.
+    int teamOffset(int region, Team team) const;
+
+    // Spread each team's influence to neighboring regions.
+    void relaxInfluence();
+
     int width_;
     int height_;
     int numTeams_;
     std::vector<int> influence_;
+    std::vector<int> influenceToDraw_;
+    SdlSurface updateSurf_;
 };
 
 #endif

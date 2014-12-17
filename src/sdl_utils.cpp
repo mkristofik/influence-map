@@ -105,6 +105,7 @@ SdlSurface sdlLoadImage(const std::string &filename)
 
 bool sdlInsideRect(int px, int py, const SDL_Rect &rect)
 {
+    // TODO: SDL 2.0 has an API for this?
     return px >= rect.x &&
            py >= rect.y &&
            px < rect.x + rect.w &&
