@@ -138,6 +138,56 @@ double sdlDistance(const SDL_Point &p1, const SDL_Point &p2)
     return std::sqrt(dx * dx + dy * dy);
 }
 
+SDL_Color sdlGetPixel(const SdlSurface &surf, const Uint8 *pixel)
+{
+    SDL_Color c{0};
+    const auto format = surf->format;
+    if (format->BytesPerPixel == 3) {
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        c.r = pixel[2];
+        c.g = pixel[1];
+        c.b = pixel[0];
+#else
+        c.r = pixel[0];
+        c.g = pixel[1];
+        c.b = pixel[2];
+#endif
+    }
+    else if (format->BytesPerPixel == 4) {
+        SDL_GetRGBA(*reinterpret_cast<const Uint32 *>(pixel), format,
+                    &c.r, &c.g, &c.b, &c.a);
+    }
+    else {
+        assert(false);
+    }
+
+    return c;
+}
+
+void sdlSetPixel(SdlSurface &surf, Uint8 *pixel, const SDL_Color &color)
+{
+    const auto format = surf->format;
+    if (format->BytesPerPixel == 3) {
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        pixel[2] = color.r;
+        pixel[1] = color.g;
+        pixel[0] = color.b;
+#else
+        pixel[0] = color.r;
+        pixel[1] = color.g;
+        pixel[2] = color.b;
+#endif
+    }
+    else if (format->BytesPerPixel == 4) {
+        auto target = reinterpret_cast<Uint32 *>(pixel);
+        *target = SDL_MapRGBA(surf->format, color.r, color.g, color.b,
+                              color.a);
+    }
+    else {
+        assert(false);
+    }
+}
+
 SdlClipRect::SdlClipRect(SDL_Renderer *renderer, const SDL_Rect &clip)
     : ren_{renderer},
     orig_{}

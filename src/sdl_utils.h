@@ -50,7 +50,11 @@ bool sdlInsideRect(int px, int py, const SDL_Rect &rect);
 SDL_Rect sdlBoundRect(SDL_Rect src, const SDL_Rect &bounds);
 
 // Pixel-level Euclidian distance.
-double sdlDist(const SDL_Point &p1, const SDL_Point &p2);
+double sdlDistance(const SDL_Point &p1, const SDL_Point &p2);
+
+// Accessors for pixel color. Be sure to lock the surface first.
+SDL_Color sdlGetPixel(const SdlSurface &surf, const Uint8 *pixel);
+void sdlSetPixel(SdlSurface &surf, Uint8 *pixel, const SDL_Color &color);
 
 // RAII guard for setting/restoring the clipping region.
 class SdlClipRect

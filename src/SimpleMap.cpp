@@ -32,10 +32,10 @@ void SimpleMap::draw(SdlSurface &surf) const
 {
     SdlLockSurface guard{surf};
 
-    auto p = reinterpret_cast<Uint32 *>(surf->pixels);
-    for (int i = 0; i < width_ * height_; ++i, ++p) {
-        const auto color = getColor(i);
-        *p = SDL_MapRGB(surf->format, color.r, color.g, color.b);
+    auto p = static_cast<Uint8 *>(surf->pixels);
+    const auto bpp = surf->format->BytesPerPixel;
+    for (int i = 0; i < width_ * height_; ++i, p += bpp) {
+        sdlSetPixel(surf, p, getColor(i));
     }
 }
 
