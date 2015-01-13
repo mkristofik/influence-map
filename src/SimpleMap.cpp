@@ -121,7 +121,12 @@ SDL_Color SimpleMap::getBorderColor(int reg1, int reg2) const
     const auto owner2 = getOwner(reg2);
 
     if (owner1 == owner2) {
-        return BLACK;
+        if (owner1 != -1) {
+            return BORDER_FG;
+        }
+        else {
+            return BLACK;
+        }
     }
     else if (owner1 == -1) {
         return teamColors[owner2];
@@ -132,14 +137,20 @@ SDL_Color SimpleMap::getBorderColor(int reg1, int reg2) const
 
 int SimpleMap::getOwner(int region) const
 {
-    auto begin = &influenceToDraw_[region * numTeams_];
-    auto end = &influenceToDraw_[(region + 1) * numTeams_];
-    auto maxPtr = std::max_element(begin, end);
-    if (*maxPtr > 0) {
-        return std::distance(begin, maxPtr);
+    auto maxInfl = 0;
+    auto owner = -1;
+    auto team = 0;
+    for (int i = region * numTeams_; i < (region + 1) * numTeams_; ++i, ++team) {
+        if (influenceToDraw_[i] > maxInfl) {
+            maxInfl = influenceToDraw_[i];
+            owner = team;
+        }
+        else if (influenceToDraw_[i] == maxInfl) {
+            owner = -1;
+        }
     }
 
-    return -1;
+    return owner;
 }
 
 int SimpleMap::teamOffset(int region, Team team) const
@@ -161,7 +172,7 @@ void SimpleMap::relaxInfluence()
             influenceToDraw_[offsetN] = influence_[i] / 4;
         }
         const auto offsetE = i + numTeams_;
-        if (offsetE < size) {
+        if ((offsetE - (i % numTeams_)) % (xRegions * numTeams_) != 0) {
             influenceToDraw_[offsetE] = influence_[i] / 4;
         }
         const auto offsetS = i + xRegions * numTeams_;
@@ -169,7 +180,7 @@ void SimpleMap::relaxInfluence()
             influenceToDraw_[offsetS] = influence_[i] / 4;
         }
         const auto offsetW = i - numTeams_;
-        if (offsetW >= 0) {
+        if ((i - (i % numTeams_)) % (xRegions * numTeams_) != 0) {
             influenceToDraw_[offsetW] = influence_[i] / 4;
         }
     }
