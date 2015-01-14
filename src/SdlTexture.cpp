@@ -74,6 +74,21 @@ void SdlTexture::draw(int px, int py, const SDL_Rect *srcRect)
     }
 }
 
+void SdlTexture::draw(const SDL_Point &p, const SDL_Rect *srcRect)
+{
+    draw(p.x, p.y, srcRect);
+}
+
+void SdlTexture::drawCentered(int px, int py, const SDL_Rect *srcRect)
+{
+    draw(px - width_ / 2, py - height_ / 2, srcRect);
+}
+
+void SdlTexture::drawCentered(const SDL_Point &p, const SDL_Rect *srcRect)
+{
+    drawCentered(p.x, p.y, srcRect);
+}
+
 void SdlTexture::drawRotated(int px, int py, double angle_rad,
                              const SDL_Rect *srcRect)
 {
@@ -92,6 +107,12 @@ void SdlTexture::drawRotated(int px, int py, double angle_rad,
     }
 }
 
+void SdlTexture::drawRotated(const SDL_Point &p, double angle_rad,
+                             const SDL_Rect *srcRect)
+{
+    drawRotated(p.x, p.y, angle_rad, srcRect);
+}
+
 void SdlTexture::drawFlippedH(int px, int py, const SDL_Rect *srcRect)
 {
     assert(*this);
@@ -108,6 +129,11 @@ void SdlTexture::drawFlippedH(int px, int py, const SDL_Rect *srcRect)
     }
 }
 
+void SdlTexture::drawFlippedH(const SDL_Point &p, const SDL_Rect *srcRect)
+{
+    drawFlippedH(p.x, p.y, srcRect);
+}
+
 void SdlTexture::drawZoomed(int px, int py, double zoom,
                             const SDL_Rect *srcRect)
 {
@@ -119,6 +145,12 @@ void SdlTexture::drawZoomed(int px, int py, double zoom,
     {
         std::cerr << "Error drawing texture zoomed by int: " << SDL_GetError();
     }
+}
+
+void SdlTexture::drawZoomed(const SDL_Point &p, double zoom,
+                            const SDL_Rect *srcRect)
+{
+    drawZoomed(p.x, p.y, zoom, srcRect);
 }
 
 void SdlTexture::drawZoomed(const SDL_Rect &destRect, const SDL_Rect *srcRect)

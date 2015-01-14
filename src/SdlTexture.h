@@ -34,16 +34,26 @@ public:
     // Draw the texture to its window using (px,py) as the upper-left corner.
     // Optionally provide 'srcRect' to draw only a portion of the image.
     void draw(int px, int py, const SDL_Rect *srcRect = nullptr);
+    void draw(const SDL_Point &p, const SDL_Rect *srcRect = nullptr);
+
+    // Draw the texture using (px,py) as the center point.
+    void drawCentered(int px, int py, const SDL_Rect *srcRect = nullptr);
+    void drawCentered(const SDL_Point &p, const SDL_Rect *srcRect = nullptr);
 
     // Rotate the texture clockwise before drawing.
     void drawRotated(int px, int py, double angle_rad,
                      const SDL_Rect *srcRect = nullptr);
+    void drawRotated(const SDL_Point &p, double angle_rad,
+                     const SDL_Rect *srcRect = nullptr);
 
     // Flip the texture before drawing.
     void drawFlippedH(int px, int py, const SDL_Rect *srcRect = nullptr);
+    void drawFlippedH(const SDL_Point &p, const SDL_Rect *srcRect = nullptr);
 
     // Scale a texture up (> 1.0) or down (< 1.0) before drawing.
     void drawZoomed(int px, int py, double zoom,
+                    const SDL_Rect *srcRect = nullptr);
+    void drawZoomed(const SDL_Point &p, double zoom,
                     const SDL_Rect *srcRect = nullptr);
 
     // Draw a texture scaled to fit the given destination rectangle.
