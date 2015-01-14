@@ -35,6 +35,10 @@ public:
 
     void addEntity(MapEntity entity);
     void moveEntity(int id, int toReg);
+    int getRegion(int entityId) const;
+
+    // Return the center pixel of the given region.
+    SDL_Point pixelFromRegion(int reg) const;
 
 private:
     SDL_Point pixelFromAry(int a) const;
@@ -54,6 +58,9 @@ private:
     // Spread each entity's influence to neighboring regions.
     void addInfluence(int region, Team team, int value);
     void relaxInfluence();
+
+    const MapEntity * findEntity(int id) const;
+    MapEntity * findEntity(int id);
 
     int width_;
     int height_;

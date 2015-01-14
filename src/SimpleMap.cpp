@@ -79,12 +79,32 @@ void SimpleMap::addEntity(MapEntity entity)
 
 void SimpleMap::moveEntity(int id, int toReg)
 {
-    auto it = lower_bound(begin(entities_), end(entities_), id,
-        [] (const MapEntity &elem, int id) { return elem.id < id; });
-
-    if (it != end(entities_) && it->id == id) {
-        it->region = toReg;
+    auto entity = findEntity(id);
+    if (entity) {
+        entity->region = toReg;
     }
+}
+
+int SimpleMap::getRegion(int entityId) const
+{
+    auto entity = findEntity(entityId);
+    if (!entity) {
+        return -1;
+    }
+    return entity->region;
+}
+
+SDL_Point SimpleMap::pixelFromRegion(int reg) const
+{
+    if (reg < 0 || reg >= xRegions * yRegions) {
+        return xyInvalid;
+    }
+
+    const int rx = reg % xRegions;
+    const int ry = reg / xRegions;
+    const int rWidth = width_ / xRegions;
+    const int rHeight = height_ / yRegions;
+    return {rx * rWidth + rWidth / 2, ry * rHeight + rHeight / 2};
 }
 
 SDL_Point SimpleMap::pixelFromAry(int a) const
@@ -213,4 +233,21 @@ void SimpleMap::relaxInfluence()
              }
         }
     }
+}
+
+const MapEntity * SimpleMap::findEntity(int id) const
+{
+    auto it = lower_bound(begin(entities_), end(entities_), id,
+        [] (const MapEntity &elem, int id) { return elem.id < id; });
+
+    if (it != end(entities_) && it->id == id) {
+        return &*it;
+    }
+
+    return nullptr;
+}
+
+MapEntity * SimpleMap::findEntity(int id)
+{
+    return const_cast<MapEntity *>(const_cast<const SimpleMap &>(*this).findEntity(id));
 }

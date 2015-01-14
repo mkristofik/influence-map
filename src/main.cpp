@@ -24,39 +24,36 @@ namespace
     const int winWidth = 1280;
     const int winHeight = 768;
     std::unique_ptr<SimpleMap> advMap;
-    int rPlayer1 = 1;
-    int rPlayer2 = 31;
     bool isDirty = true;
 }
 
 void handleKeyUp(const SDL_KeyboardEvent &event)
 {
+    const int rPlayer1 = advMap->getRegion(1);
+    const int rPlayer2 = advMap->getRegion(2);
+
     switch (event.keysym.sym) {
         case SDLK_a:
             if (rPlayer1 > 0) {
-                --rPlayer1;
-                advMap->moveEntity(1, rPlayer1);
+                advMap->moveEntity(1, rPlayer1 - 1);
                 isDirty = true;
             }
             break;
         case SDLK_d:
             if (rPlayer1 < 31) {
-                ++rPlayer1;
-                advMap->moveEntity(1, rPlayer1);
+                advMap->moveEntity(1, rPlayer1 + 1);
                 isDirty = true;
             }
             break;
         case SDLK_h:
             if (rPlayer2 > 0) {
-                --rPlayer2;
-                advMap->moveEntity(2, rPlayer2);
+                advMap->moveEntity(2, rPlayer2 - 1);
                 isDirty = true;
             }
             break;
         case SDLK_l:
             if (rPlayer2 < 31) {
-                ++rPlayer2;
-                advMap->moveEntity(2, rPlayer2);
+                advMap->moveEntity(2, rPlayer2 + 1);
                 isDirty = true;
             }
             break;
@@ -68,8 +65,8 @@ int real_main(int argc, char **argv)
     SdlWindow win{winWidth, winHeight, "Influence Map Test"};
 
     advMap.reset(new SimpleMap{winWidth, winHeight, 2, win});
-    advMap->addEntity(MapEntity{1, rPlayer1, 8, Team::BLUE});
-    advMap->addEntity(MapEntity{2, rPlayer2, 8, Team::RED});
+    advMap->addEntity(MapEntity{1, 1, 8, Team::BLUE});
+    advMap->addEntity(MapEntity{2, 30, 8, Team::RED});
 
     SdlTextureStream advMapImg{advMap->draw(), win};
 
@@ -96,8 +93,8 @@ int real_main(int argc, char **argv)
             win.clear();
             advMapImg.update(advMap->draw());
             advMapImg.draw(0, 0);
-            player1.draw(204, 60);
-            player2.draw(1164, 636);
+            player1.drawCentered(advMap->pixelFromRegion(advMap->getRegion(1)));
+            player2.drawCentered(advMap->pixelFromRegion(advMap->getRegion(2)));
             win.draw();
             isDirty = false;
         }
