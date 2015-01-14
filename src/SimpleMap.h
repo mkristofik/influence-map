@@ -18,12 +18,23 @@
 #include "team_color.h"
 #include <vector>
 
+struct MapEntity
+{
+    int id;
+    int region;
+    int influence;
+    Team team;
+};
+
+
 class SimpleMap
 {
 public:
     SimpleMap(int width, int height, int numTeams, const SdlWindow &win);
     SdlSurface draw();
-    void setInfluence(int region, Team team, int value);
+
+    void addEntity(MapEntity entity);
+    void moveEntity(int id, int toReg);
 
 private:
     SDL_Point pixelFromAry(int a) const;
@@ -40,14 +51,15 @@ private:
     // Return the index of the team's data in the influence map.
     int teamOffset(int region, Team team) const;
 
-    // Spread each team's influence to neighboring regions.
+    // Spread each entity's influence to neighboring regions.
+    void addInfluence(int region, Team team, int value);
     void relaxInfluence();
 
     int width_;
     int height_;
     int numTeams_;
     std::vector<int> influence_;
-    std::vector<int> influenceToDraw_;
+    std::vector<MapEntity> entities_;
     SdlSurface updateSurf_;
 };
 

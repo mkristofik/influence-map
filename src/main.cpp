@@ -31,46 +31,45 @@ namespace
 
 void handleKeyUp(const SDL_KeyboardEvent &event)
 {
-    advMap->setInfluence(rPlayer1, Team::BLUE, 0);
-    advMap->setInfluence(rPlayer2, Team::RED, 0);
-
     switch (event.keysym.sym) {
         case SDLK_a:
             if (rPlayer1 > 0) {
                 --rPlayer1;
+                advMap->moveEntity(1, rPlayer1);
                 isDirty = true;
             }
             break;
         case SDLK_d:
             if (rPlayer1 < 31) {
                 ++rPlayer1;
+                advMap->moveEntity(1, rPlayer1);
                 isDirty = true;
             }
             break;
         case SDLK_h:
             if (rPlayer2 > 0) {
                 --rPlayer2;
+                advMap->moveEntity(2, rPlayer2);
                 isDirty = true;
             }
             break;
         case SDLK_l:
             if (rPlayer2 < 31) {
                 ++rPlayer2;
+                advMap->moveEntity(2, rPlayer2);
                 isDirty = true;
             }
             break;
     }
-
-    advMap->setInfluence(rPlayer1, Team::BLUE, 8);
-    advMap->setInfluence(rPlayer2, Team::RED, 8);
 }
 
 int real_main(int argc, char **argv)
 {
     SdlWindow win{winWidth, winHeight, "Influence Map Test"};
+
     advMap.reset(new SimpleMap{winWidth, winHeight, 2, win});
-    advMap->setInfluence(rPlayer1, Team::BLUE, 8);
-    advMap->setInfluence(rPlayer2, Team::RED, 8);
+    advMap->addEntity(MapEntity{1, rPlayer1, 8, Team::BLUE});
+    advMap->addEntity(MapEntity{2, rPlayer2, 8, Team::RED});
 
     SdlTextureStream advMapImg{advMap->draw(), win};
 

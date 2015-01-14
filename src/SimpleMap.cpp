@@ -12,6 +12,7 @@
 */
 #include "SimpleMap.h"
 #include <algorithm>
+#include <array>
 #include <iostream> //TODO
 
 namespace
@@ -19,6 +20,31 @@ namespace
     const int xRegions = 8;
     const int yRegions = 4;
     const SDL_Point xyInvalid = {-1, -1};
+
+    std::array<int, 4> regionNeighbors(int reg)
+    {
+        std::array<int, 4> nbrs;
+        nbrs.fill(-1);
+
+        const int regN = reg - xRegions;
+        if (regN >= 0) {
+            nbrs[0] = regN;
+        }
+        const int regE = reg + 1;
+        if (regE % xRegions != 0) {
+            nbrs[1] = regE;
+        }
+        const int regS = reg + xRegions;
+        if (regS < xRegions * yRegions) {
+            nbrs[2] = regS;
+        }
+        const int regW = reg - 1;
+        if (reg % xRegions != 0) {
+            nbrs[3] = regW;
+        }
+
+        return nbrs;
+    }
 }
 
 SimpleMap::SimpleMap(int width, int height, int numTeams, const SdlWindow &win)
@@ -26,6 +52,7 @@ SimpleMap::SimpleMap(int width, int height, int numTeams, const SdlWindow &win)
     height_{height},
     numTeams_{numTeams},
     influence_(xRegions * yRegions * numTeams_, 0),
+    entities_{},
     updateSurf_{win.createBlankSurface(width_, height_)}
 {
 }
@@ -44,9 +71,20 @@ SdlSurface SimpleMap::draw()
     return updateSurf_;
 }
 
-void SimpleMap::setInfluence(int region, Team team, int value)
+void SimpleMap::addEntity(MapEntity entity)
 {
-    influence_[teamOffset(region, team)] = value;
+    // TODO: this needs to be sorted
+    entities_.push_back(entity);
+}
+
+void SimpleMap::moveEntity(int id, int toReg)
+{
+    auto it = lower_bound(begin(entities_), end(entities_), id,
+        [] (const MapEntity &elem, int id) { return elem.id < id; });
+
+    if (it != end(entities_) && it->id == id) {
+        it->region = toReg;
+    }
 }
 
 SDL_Point SimpleMap::pixelFromAry(int a) const
@@ -141,11 +179,11 @@ int SimpleMap::getOwner(int region) const
     auto owner = -1;
     auto team = 0;
     for (int i = region * numTeams_; i < (region + 1) * numTeams_; ++i, ++team) {
-        if (influenceToDraw_[i] > maxInfl) {
-            maxInfl = influenceToDraw_[i];
+        if (influence_[i] > maxInfl) {
+            maxInfl = influence_[i];
             owner = team;
         }
-        else if (influenceToDraw_[i] == maxInfl) {
+        else if (influence_[i] == maxInfl) {
             owner = -1;
         }
     }
@@ -158,30 +196,21 @@ int SimpleMap::teamOffset(int region, Team team) const
     return region * numTeams_ + static_cast<int>(team);
 }
 
+void SimpleMap::addInfluence(int region, Team team, int value)
+{
+    influence_[teamOffset(region, team)] += value;
+}
+
 void SimpleMap::relaxInfluence()
 {
-    influenceToDraw_ = influence_;
-    const int size = influenceToDraw_.size();
-    for (int i = 0; i < size; ++i) {
-        if (influence_[i] == 0) {
-            continue;
-        }
+    fill(begin(influence_), end(influence_), 0);
 
-        const auto offsetN = i - xRegions * numTeams_;
-        if (offsetN >= 0) {
-            influenceToDraw_[offsetN] = influence_[i] / 4;
-        }
-        const auto offsetE = i + numTeams_;
-        if ((offsetE - (i % numTeams_)) % (xRegions * numTeams_) != 0) {
-            influenceToDraw_[offsetE] = influence_[i] / 4;
-        }
-        const auto offsetS = i + xRegions * numTeams_;
-        if (offsetS < size) {
-            influenceToDraw_[offsetS] = influence_[i] / 4;
-        }
-        const auto offsetW = i - numTeams_;
-        if ((i - (i % numTeams_)) % (xRegions * numTeams_) != 0) {
-            influenceToDraw_[offsetW] = influence_[i] / 4;
+    for (const auto &e : entities_) {
+        addInfluence(e.region, e.team, e.influence);
+        for (auto r: regionNeighbors(e.region)) {
+             if (r != -1) {
+                 addInfluence(r, e.team, e.influence / 4);
+             }
         }
     }
 }
