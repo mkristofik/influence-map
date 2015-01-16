@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2014 by Michael Kristofik <kristo605@gmail.com>
+    Copyright (C) 2014-2015 by Michael Kristofik <kristo605@gmail.com>
     Part of the influence-map project.
 
     This program is free software; you can redistribute it and/or modify
