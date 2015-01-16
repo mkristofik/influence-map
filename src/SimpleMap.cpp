@@ -47,17 +47,18 @@ namespace
     }
 }
 
-SimpleMap::SimpleMap(int width, int height, int numTeams, const SdlWindow &win)
+SimpleMap::SimpleMap(int width, int height, int numTeams,
+                     const SdlSurface &blankUpdateSurf)
     : width_{width},
     height_{height},
     numTeams_{numTeams},
     influence_(xRegions * yRegions * numTeams_, 0),
     entities_{},
-    updateSurf_{win.createBlankSurface(width_, height_)}
+    updateSurf_{blankUpdateSurf}
 {
 }
 
-SdlSurface SimpleMap::draw()
+SdlSurface SimpleMap::update()
 {
     relaxInfluence();
 

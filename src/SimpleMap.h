@@ -13,7 +13,6 @@
 #ifndef SIMPLE_MAP_H
 #define SIMPLE_MAP_H
 
-#include "SdlWindow.h"
 #include "sdl_utils.h"
 #include "team_color.h"
 #include <vector>
@@ -30,8 +29,10 @@ struct MapEntity
 class SimpleMap
 {
 public:
-    SimpleMap(int width, int height, int numTeams, const SdlWindow &win);
-    SdlSurface draw();
+    SimpleMap(int width, int height, int numTeams,
+              const SdlSurface &blankUpdateSurf);
+
+    SdlSurface update();
 
     void addEntity(MapEntity entity);
     void moveEntity(int id, int toReg);

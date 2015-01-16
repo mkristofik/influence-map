@@ -97,3 +97,11 @@ SdlSurface SdlWindow::createBlankSurface(int width, int height) const
 
     return make_surface(surf);
 }
+
+SdlSurface SdlWindow::createBlankSurface() const
+{
+    int width = 0;
+    int height = 0;
+    SDL_GetWindowSize(window_.get(), &width, &height);
+    return createBlankSurface(width, height);
+}

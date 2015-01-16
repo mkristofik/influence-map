@@ -13,6 +13,11 @@
 #include "SdlTextureStream.h"
 #include <cassert>
 
+SdlTextureStream::SdlTextureStream()
+    : tex_{}
+{
+}
+
 SdlTextureStream::SdlTextureStream(const SdlSurface &surf, SdlWindow &win)
     : tex_{}
 {

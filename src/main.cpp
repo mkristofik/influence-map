@@ -10,6 +10,7 @@
 
     See the COPYING.txt file for more details.
 */
+#include "GameWindow.h"
 #include "SdlTextureStream.h"
 #include "SdlWindow.h"
 #include "SimpleMap.h"
@@ -62,18 +63,16 @@ void handleKeyUp(const SDL_KeyboardEvent &event)
 
 int real_main(int argc, char **argv)
 {
-    SdlWindow win{winWidth, winHeight, "Influence Map Test"};
+    GameWindow win{winWidth, winHeight, "Influence Map Test"};
 
-    advMap.reset(new SimpleMap{winWidth, winHeight, 2, win});
+    advMap.reset(new SimpleMap{winWidth, winHeight, 2, win.getBlankMap()});
     advMap->addEntity(MapEntity{1, 1, 8, Team::BLUE});
     advMap->addEntity(MapEntity{2, 30, 8, Team::RED});
 
-    SdlTextureStream advMapImg{advMap->draw(), win};
-
     auto img1 = applyTeamColor(sdlLoadImage("cavalier.png"), Team::BLUE);
-    auto player1 = SdlTexture{img1, win};
+    win.addEntity(1, advMap->pixelFromRegion(advMap->getRegion(1)), img1);
     auto img2 = applyTeamColor(sdlLoadImage("orc-grunt.png"), Team::RED);
-    auto player2 = SdlTexture{img2, win};
+    win.addEntity(2, advMap->pixelFromRegion(advMap->getRegion(2)), img2);
 
     bool isDone = false;
     SDL_Event event;
@@ -90,11 +89,9 @@ int real_main(int argc, char **argv)
         }
 
         if (isDirty) {
-            win.clear();
-            advMapImg.update(advMap->draw());
-            advMapImg.draw(0, 0);
-            player1.drawCentered(advMap->pixelFromRegion(advMap->getRegion(1)));
-            player2.drawCentered(advMap->pixelFromRegion(advMap->getRegion(2)));
+            win.updateMap(advMap->update());
+            win.moveEntity(1, advMap->pixelFromRegion(advMap->getRegion(1)));
+            win.moveEntity(2, advMap->pixelFromRegion(advMap->getRegion(2)));
             win.draw();
             isDirty = false;
         }

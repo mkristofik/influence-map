@@ -22,6 +22,7 @@
 class SdlTextureStream
 {
 public:
+    SdlTextureStream();
     SdlTextureStream(const SdlSurface &surf, SdlWindow &win);
 
     void update(const SdlSurface &surf);

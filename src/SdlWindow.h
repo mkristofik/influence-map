@@ -34,6 +34,7 @@ public:
 
     // Create a blank surface with the same pixel format as the window.
     SdlSurface createBlankSurface(int width, int height) const;
+    SdlSurface createBlankSurface() const;  // same size as window
 
 private:
     std::unique_ptr<SDL_Window, decltype(&SDL_DestroyWindow)> window_;
