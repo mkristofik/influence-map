@@ -24,38 +24,89 @@ namespace
 {
     const int winWidth = 1280;
     const int winHeight = 768;
-    std::unique_ptr<SimpleMap> advMap;
-    bool isDirty = true;
 }
 
-void handleKeyUp(const SDL_KeyboardEvent &event)
+
+class Game
 {
-    const int rPlayer1 = advMap->getRegion(1);
-    const int rPlayer2 = advMap->getRegion(2);
+public:
+    Game();
+    void loadScenario();
+    void update();
+
+    void handleKeyUp(const SDL_KeyboardEvent &event);
+
+private:
+    bool isDirty_;
+    GameWindow win_;
+    SimpleMap advMap_;
+};
+
+Game::Game()
+    : isDirty_{true},
+    win_{winWidth, winHeight, "Influence Map Test"},
+    advMap_{winWidth, winHeight, 2, win_.getBlankMap()}
+{
+}
+
+void Game::loadScenario()
+{
+    advMap_.addEntity(MapEntity{1, 1, 8, Team::BLUE});
+    advMap_.addEntity(MapEntity{2, 30, 8, Team::RED});
+
+    auto img1 = applyTeamColor(sdlLoadImage("cavalier.png"), Team::BLUE);
+    win_.addEntity(1, advMap_.pixelFromRegion(advMap_.getRegion(1)), img1);
+    auto img2 = applyTeamColor(sdlLoadImage("orc-grunt.png"), Team::RED);
+    win_.addEntity(2, advMap_.pixelFromRegion(advMap_.getRegion(2)), img2);
+}
+
+void Game::update()
+{
+    if (!isDirty_) {
+        return;
+    }
+
+    win_.updateMap(advMap_.update());
+    win_.draw();
+    isDirty_ = false;
+}
+
+void Game::handleKeyUp(const SDL_KeyboardEvent &event)
+{
+    auto rPlayer1 = advMap_.getRegion(1);
+    auto rPlayer2 = advMap_.getRegion(2);
 
     switch (event.keysym.sym) {
         case SDLK_a:
             if (rPlayer1 > 0) {
-                advMap->moveEntity(1, rPlayer1 - 1);
-                isDirty = true;
+                --rPlayer1;
+                win_.moveEntity(1, advMap_.pixelFromRegion(rPlayer1));
+                advMap_.moveEntity(1, rPlayer1);
+                isDirty_ = true;
             }
             break;
         case SDLK_d:
             if (rPlayer1 < 31) {
-                advMap->moveEntity(1, rPlayer1 + 1);
-                isDirty = true;
+                ++rPlayer1;
+                win_.moveEntity(1, advMap_.pixelFromRegion(rPlayer1));
+                advMap_.moveEntity(1, rPlayer1);
+                isDirty_ = true;
             }
             break;
         case SDLK_h:
             if (rPlayer2 > 0) {
-                advMap->moveEntity(2, rPlayer2 - 1);
-                isDirty = true;
+                --rPlayer2;
+                win_.moveEntity(2, advMap_.pixelFromRegion(rPlayer2));
+                advMap_.moveEntity(2, rPlayer2);
+                isDirty_ = true;
             }
             break;
         case SDLK_l:
             if (rPlayer2 < 31) {
-                advMap->moveEntity(2, rPlayer2 + 1);
-                isDirty = true;
+                ++rPlayer2;
+                win_.moveEntity(2, advMap_.pixelFromRegion(rPlayer2));
+                advMap_.moveEntity(2, rPlayer2);
+                isDirty_ = true;
             }
             break;
     }
@@ -63,16 +114,8 @@ void handleKeyUp(const SDL_KeyboardEvent &event)
 
 int real_main(int argc, char **argv)
 {
-    GameWindow win{winWidth, winHeight, "Influence Map Test"};
-
-    advMap.reset(new SimpleMap{winWidth, winHeight, 2, win.getBlankMap()});
-    advMap->addEntity(MapEntity{1, 1, 8, Team::BLUE});
-    advMap->addEntity(MapEntity{2, 30, 8, Team::RED});
-
-    auto img1 = applyTeamColor(sdlLoadImage("cavalier.png"), Team::BLUE);
-    win.addEntity(1, advMap->pixelFromRegion(advMap->getRegion(1)), img1);
-    auto img2 = applyTeamColor(sdlLoadImage("orc-grunt.png"), Team::RED);
-    win.addEntity(2, advMap->pixelFromRegion(advMap->getRegion(2)), img2);
+    Game game;
+    game.loadScenario();
 
     bool isDone = false;
     SDL_Event event;
@@ -80,7 +123,7 @@ int real_main(int argc, char **argv)
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
                 case SDL_KEYUP:
-                    handleKeyUp(event.key);
+                    game.handleKeyUp(event.key);
                     break;
                 case SDL_QUIT:
                     isDone = true;
@@ -88,18 +131,10 @@ int real_main(int argc, char **argv)
             }
         }
 
-        if (isDirty) {
-            win.updateMap(advMap->update());
-            win.moveEntity(1, advMap->pixelFromRegion(advMap->getRegion(1)));
-            win.moveEntity(2, advMap->pixelFromRegion(advMap->getRegion(2)));
-            win.draw();
-            isDirty = false;
-        }
-
+        game.update();
         SDL_Delay(1);
     }
 
-    advMap.reset();
     return EXIT_SUCCESS;
 }
 
