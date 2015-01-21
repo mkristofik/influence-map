@@ -19,6 +19,7 @@
 const std::vector<SDL_Color> teamColors = {
     {0x2E, 0x41, 0x9B, SDL_ALPHA_OPAQUE}, // blue
     {0xFF, 0, 0, SDL_ALPHA_OPAQUE},       // red
+    {0x5A, 0x5A, 0x5A, SDL_ALPHA_OPAQUE}  // grey (no team)
 };
 
 namespace
@@ -103,7 +104,7 @@ namespace
 
     const TeamColorMatrix allShades = initTeamColors();
 
-    SDL_Color translateColor(const SDL_Color &orig, Team t)
+    SDL_Color translateTeamColor(const SDL_Color &orig, Team t)
     {
         auto color = orig;
         color.a = SDL_ALPHA_OPAQUE;
@@ -116,6 +117,18 @@ namespace
 
         color.a = orig.a;
         return color;
+    }
+
+    SDL_Color translateFlagColor(const SDL_Color &orig)
+    {
+        if (orig.r != 0 || orig.b != 0) {
+            return orig;
+        }
+
+        int colorIndex = std::max(orig.g / 14 - 1, 0);
+        auto magenta = baseColors[colorIndex];
+        magenta.a = orig.a;
+        return magenta;
     }
 }
 
@@ -130,7 +143,23 @@ SdlSurface applyTeamColor(const SdlSurface &src, Team team)
     const auto end = pixel + img->w * img->h * bpp;
     for (; pixel != end; pixel += bpp) {
         const auto color = sdlGetPixel(img, pixel);
-        sdlSetPixel(img, pixel, translateColor(color, team));
+        sdlSetPixel(img, pixel, translateTeamColor(color, team));
+    }
+
+    return img;
+}
+
+SdlSurface applyFlagColor(const SdlSurface &src)
+{
+    auto img = sdlDeepCopy(src);
+    SdlLockSurface guard{img};
+
+    auto pixel = static_cast<Uint8 *>(img->pixels);
+    const auto bpp = img->format->BytesPerPixel;
+    const auto end = pixel + img->w * img->h * bpp;
+    for (; pixel != end; pixel += bpp) {
+        const auto color = sdlGetPixel(img, pixel);
+        sdlSetPixel(img, pixel, translateFlagColor(color));
     }
 
     return img;

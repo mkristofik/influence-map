@@ -53,11 +53,14 @@ void Game::loadScenario()
 {
     advMap_.addEntity(MapEntity{1, 1, 8, Team::BLUE});
     advMap_.addEntity(MapEntity{2, 30, 8, Team::RED});
+    advMap_.addEntity(MapEntity{3, 24, 0, Team::NONE});
 
     auto img1 = applyTeamColor(sdlLoadImage("cavalier.png"), Team::BLUE);
     win_.addEntity(1, advMap_.pixelFromRegion(advMap_.getRegion(1)), img1);
     auto img2 = applyTeamColor(sdlLoadImage("orc-grunt.png"), Team::RED);
     win_.addEntity(2, advMap_.pixelFromRegion(advMap_.getRegion(2)), img2);
+    auto img3 = applyTeamColor(applyFlagColor(sdlLoadImage("flag.png")), Team::NONE);
+    win_.addEntity(3, advMap_.pixelFromRegion(advMap_.getRegion(3)), img3);
 }
 
 void Game::update()

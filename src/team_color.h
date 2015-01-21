@@ -21,9 +21,13 @@
 // Wesnoth.  We reserve a specific palette of 19 shades of magenta as a
 // reference.  Those colors are replaced at runtime with the corresponding
 // color for each team.
-enum class Team {BLUE, RED};
+enum class Team {BLUE, RED, NONE};
 extern const std::vector<SDL_Color> teamColors;
 
+// Translate the magenta palette to the team color.
 SdlSurface applyTeamColor(const SdlSurface &src, Team team);
+
+// Flags are green and need to be translated to magenta first.
+SdlSurface applyFlagColor(const SdlSurface &src);
 
 #endif
